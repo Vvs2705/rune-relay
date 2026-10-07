@@ -1,0 +1,12 @@
+// L025: marco 25 | gerado (semente 25000) giraveis=6 toques=9 combinacoes=1024
+h Marco 25. Planeje tudo antes de liberar.
+q bcbc
+q adad
+q aaaa
+.   .   .   L1f Rb2 .
+Ra4 .   S1  Y10 .   Rc2
+G02 Rd2 I1f L0f I0r L3f
+I1r I1r S2  I0f .   .
+I0f I1r I0f .   .   .
+I0f L3r Y21 L2f .   .
+L1r S3  .   Ra2 .   .

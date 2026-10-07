@@ -1,0 +1,14 @@
+/Library/
+/Temp/
+/Logs/
+/obj/
+/Builds/*
+!/Builds/shots/
+!/Builds/shots2/
+/UserSettings/
+/tools/coretests/bin/
+/tools/coretests/obj/
+*.csproj
+!/tools/coretests/*.csproj
+!/tools/levelgen/*.csproj
+*.sln

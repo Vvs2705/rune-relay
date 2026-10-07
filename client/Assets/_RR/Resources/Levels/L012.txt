@@ -1,0 +1,10 @@
+// L012: fila impar no alternador | gerado (semente 12000) giraveis=3 toques=3 combinacoes=16
+h Fila ímpar: o primeiro lado recebe um orbe a mais.
+q aba
+q aaa
+L1f L2f .   .   .
+Rb1 Y30 I1f S3  .
+.   L0f I0r I0r Ra2
+.   Ra3 I0r L2f .
+.   .   .   I0f .
+.   .   .   S0  .

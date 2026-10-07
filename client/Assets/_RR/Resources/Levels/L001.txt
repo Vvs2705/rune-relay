@@ -1,0 +1,8 @@
+// L001: tocar, girar, liberar (1 toque)
+h Toque na peça clara para girá-la. Ligue a fonte ao cristal e toque em LIBERAR.
+q aaa
+.   .   .   .
+.   .   .   .
+S1  I1f L1r .
+.   .   Ra3 .
+.   .   .   .

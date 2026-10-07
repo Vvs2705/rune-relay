@@ -1,0 +1,12 @@
+// L022: quatro cores | gerado (semente 22148) giraveis=6 toques=9 combinacoes=1024
+h Quatro cores. Confira a forma, não só a cor.
+q aaa
+q dc
+q bb
+L3r S3  .   .   .
+I1r .   .   .   .
+I1r L0r Rc1 .   .
+L0f +   I1f I1f Ra3
+.   Y31 S3  L2f .
+L3r +   I0r Rb2 .
+S0  L0f Rd1 .   .

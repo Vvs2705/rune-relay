@@ -1,0 +1,9 @@
+// L017: dois alternadores | gerado (semente 17001) giraveis=4 toques=9 combinacoes=256
+h Dois alternadores. Cada seta decide um par de cores.
+q bcbc
+q aca
+Rc1 .   .   L1f Rb2
+I1r .   S1  Y10 .
+Y31 I1f S3  I1r .
+L1r L3r .   Rc2 .
+Ra2 L3f .   .   .

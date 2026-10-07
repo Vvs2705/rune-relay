@@ -1,0 +1,12 @@
+// L010: chefe, 2 alternadores + comporta + cruzamento
+h Nível chefe: dois alternadores, uma comporta e um cruzamento.
+q abab
+q cbcb
+.   .   Ra2 .   .   .
+.   .   I1r .   .   .
+.   .   I0f .   Rc2 .
+S1  I0r Y11 .   I1r .
+S1  I1f +   G10 Y11 .
+.   .   L3r I1f Rb4 .
+.   .   .   .   .   .
+.   .   .   .   .   .

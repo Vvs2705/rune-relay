@@ -1,0 +1,13 @@
+// L020: marco 20: tudo junto | gerado (semente 20015) giraveis=6 toques=9 combinacoes=2048
+h Marco 20: tudo o que você aprendeu, de uma vez.
+q cac
+q aaaa
+q bbb
+L0r L2f .   .
+Rc2 I0f Ra4 .
+L1f Y10 I1r .
+I0f L0f +   Ra1
+I1r L1f L3f .
+S0  S0  L3r L3r
+.   .   G00 Rb3
+.   .   L3r S3

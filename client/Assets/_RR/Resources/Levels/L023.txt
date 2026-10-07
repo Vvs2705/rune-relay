@@ -1,0 +1,8 @@
+// L023: duplo + simples | gerado (semente 23005) giraveis=5 toques=9 combinacoes=2048
+q dcacd
+q bcbcb
+.   Rb3 .   .   Rd2 L3r
+.   I1r Rc2 .   S2  I0f
+L1f Y11 I0f L1f Y20 Y10
+I0f L3r L1r Rc2 .   I1r
+L0f S3  .   .   .   Ra1

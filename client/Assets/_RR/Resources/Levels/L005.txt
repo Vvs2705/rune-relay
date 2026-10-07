@@ -1,0 +1,10 @@
+// L005: armadilha de cor (1a falha desenhada): o azul comeca apontado para o cristal vermelho
+h Confira a cor do cristal no fim de cada caminho antes de liberar.
+q aaa
+q bbb
+.   .   Rb3 L2f .
+S1  I1f L3r I0f .
+S1  I1f +   L1r .
+.   .   I0f .   .
+.   .   Ra3 .   .
+.   .   .   .   .

@@ -1,0 +1,14 @@
+// L028: oito giraveis | gerado (semente 28117) giraveis=8 toques=13 combinacoes=32768
+q dc
+q bbbb
+q aaaa
+L2r Rc1 S2  .   .
+L3r I1f Y20 I0r L2f
+.   .   .   .   Rd1
+.   .   S2  .   .
+.   L1f L2r .   .
+L0r +   L0r .   .
+Ra4 G01 I1r L0f .
+.   L1r +   Rb4 .
+.   I0f G03 .   .
+.   L2f S0  .   .

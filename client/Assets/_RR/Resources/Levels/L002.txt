@@ -1,0 +1,9 @@
+// L002: caminho com varios giros
+h O caminho aceso mostra por onde o próximo orbe vai passar.
+q aaaa
+.   .   .   .
+S1  L1r .   .
+.   I1r .   .
+.   L3r I1f L2f
+.   .   .   Ra4
+.   .   .   .

@@ -1,0 +1,6 @@
+﻿<Solution>
+  <Project Path="RR.csproj" />
+  <Project Path="RR.Editor.csproj" />
+  <Project Path="RR.Core.csproj" />
+  <Project Path="RR.Tests.csproj" />
+</Solution>

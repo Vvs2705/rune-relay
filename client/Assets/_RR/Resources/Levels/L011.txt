@@ -1,0 +1,8 @@
+// L011: dois caminhos se cruzam | gerado (semente 11075) giraveis=4 toques=6 combinacoes=128
+h Dois caminhos se cruzam. Resolva um de cada vez.
+q bbb
+q aaa
+Ra3 L2f .   L1f L0r
+S2  L3r L2f I0f Rb3
+L0f I0r +   L1r .
+.   .   S0  .   .

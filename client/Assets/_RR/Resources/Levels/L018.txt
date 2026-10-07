@@ -1,0 +1,12 @@
+// L018: primeira peca falsa | gerado (semente 18007) giraveis=6 toques=10 combinacoes=1024
+h Nem toda peça faz parte do caminho.
+q aa
+q cccc
+q bbb
+Ra2 L2f .   .   .   .
+S1  L2r Rb3 .   S2  .
+.   .   L2r I0r +   L2f
+.   .   S1  G10 +   L0r
+.   .   .   .   I1r .
+.   .   I0f L3r L3f .
+.   .   .   Rc4 .   .

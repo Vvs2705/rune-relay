@@ -1,0 +1,13 @@
+// L026: alternador duplo + comporta | gerado (semente 26032) giraveis=6 toques=11 combinacoes=4096
+q aaaaa
+q acdca
+q bbbbb
+L0r L1r Rc2 .   .
+I0f L0f +   G11 L2f
+S0  Rd1 Y31 S3  Ra5
+L2f I0f I1r .   .
+.   L1r Y21 I1f L2f
+.   L3r S3  .   Ra2
+.   I1r .   .   .
+.   I0f .   .   .
+Rb5 L3f I1f .   .

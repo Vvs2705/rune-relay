@@ -1,0 +1,13 @@
+// L007: sintese, 3 cores, cruzamento + comporta
+h Três cores ao mesmo tempo. Planeje tudo, depois libere.
+q bbb
+q aaa
+q ccc
+.   .   S2  .   .   .
+.   .   I1r .   .   .
+S1  I1f +   I0r Ra3 .
+.   .   G00 .   .   .
+.   .   L2r I1f Rb3 .
+.   .   .   Rc3 I0r L1r
+.   .   .   .   .   I0f
+.   .   .   .   .   S0

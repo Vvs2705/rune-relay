@@ -1,0 +1,12 @@
+// L009: seta inicial errada; o ramo apagado tambem precisa estar certo
+h Só o caminho do próximo orbe acende. O outro lado do alternador também precisa estar certo!
+q abab
+q cc
+.   .   .   .   .   .
+.   Ra2 .   .   Rb2 .
+.   I1r .   .   I0f .
+.   L0f I1f Y01 L2r .
+.   .   .   I0f .   .
+.   .   .   S0  .   .
+.   .   Rc2 I1f I0r S3
+.   .   .   .   .   .

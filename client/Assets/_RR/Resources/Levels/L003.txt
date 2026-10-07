@@ -1,0 +1,10 @@
+// L003: duas cores; cor errada racha o cristal
+h Cada cor no seu cristal. Cor errada racha o cristal!
+q bbb
+q aaa
+.   .   .   .   .
+.   .   Rb3 I0r S3
+S1  I1f L1r .   .
+.   .   Ra3 .   .
+.   .   .   .   .
+.   .   .   .   .

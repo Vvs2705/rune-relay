@@ -1,0 +1,13 @@
+// L021: comportas em cadeia | gerado (semente 21000) giraveis=6 toques=10 combinacoes=512
+h Comportas em cadeia: uma abre a outra.
+q aaa
+q bb
+q ccc
+.   Ra3 .   .   .   .
+.   I1r L1f L3r .   .
+.   L0f L1r G01 .   .
+.   .   .   S0  .   .
+.   .   L1f S2  .   .
+.   .   .   I0f .   Rb2
+L1f G10 L0r I1r .   I1r
+S0  .   Rc3 L0f I1f L3f

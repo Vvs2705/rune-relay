@@ -1,0 +1,11 @@
+// L004: cruzamento, os fluxos passam sem misturar
+h No cruzamento, os fluxos passam um por cima do outro sem misturar.
+q bbbb
+q aaaa
+.   .   S2  .   .
+.   .   I0f .   .
+.   .   I1r .   .
+S1  I1f +   I0r Ra4
+.   .   I0f .   .
+.   .   Rb4 .   .
+.   .   .   .   .

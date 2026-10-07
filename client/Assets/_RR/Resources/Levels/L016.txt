@@ -1,0 +1,13 @@
+// L016: tres fontes | gerado (semente 16010) giraveis=5 toques=5 combinacoes=64
+h Três fontes. Cada uma com seu caminho.
+q bbb
+q aaaa
+q cccc
+L1f Ra4 .   .   .   .
+L3r L2f .   .   .   .
+L1f L3f .   .   .   S2
+S0  .   .   .   S2  I1r
+.   .   Rb3 .   I1r I1r
+.   .   L0f I1f +   L3f
+.   .   .   .   I1r Rc4
+.   .   .   .   L0f L3f

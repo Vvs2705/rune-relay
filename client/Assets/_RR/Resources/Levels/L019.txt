@@ -1,0 +1,11 @@
+// L019: alternador duplo | gerado (semente 19001) giraveis=4 toques=8 combinacoes=256
+h Dois alternadores em sequência separam três cores.
+q bcbab
+q aaaaaa
+.   .   .   Rb3 L2f .
+.   .   .   .   I1r Rc1
+.   .   .   S1  Y10 I0f
+.   L1f L2f L1f Y21 L3f
+Ra6 L1r I0f I1r .   .
+.   .   I0f Ra1 .   .
+.   .   L1r S3  .   .

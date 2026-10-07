@@ -1,0 +1,14 @@
+// L030: chefe 30 | gerado (semente 30076) giraveis=7 toques=13 combinacoes=8192
+h O Observatório inteiro depende de você. Boa sorte.
+q cbcbc
+q aaaaa
+q bdcdbd
+Ra5 .   Rb2 .   L2f .
+L3r G13 +   I1f L0r .
+.   .   Y31 I0r +   S3
+L1f Rd3 G05 .   I1r I0f
+I0f .   Rc3 .   S0  .
+I1r S2  Rb2 .   .   .
+Y31 L0r I1r .   .   .
+L0f I1f Y11 .   .   .
+I1f Rc1 L3f .   .   .

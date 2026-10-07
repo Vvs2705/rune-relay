@@ -1,0 +1,10 @@
+// L014: alternador + cruzamento | gerado (semente 14001) giraveis=4 toques=6 combinacoes=128
+h Três cores, duas fontes. Uma delas se divide.
+q bcbc
+q aa
+.   .   .   L2r Ra2
+.   .   .   I1r .
+Rb2 I1f Y00 +   Rc2
+.   .   I1r I0f .
+.   L1f L3f I0f .
+S1  L2r .   S0  .

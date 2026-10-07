@@ -1,0 +1,8 @@
+// L013: comporta | gerado (semente 13000) giraveis=4 toques=5 combinacoes=64
+h Qual cristal abre a comporta? Veja a forma desenhada nela.
+q bbb
+q aaaa
+L3r I0r L1r .
+G01 S2  S0  .
+I0f I0f .   .
+Ra4 L0f I0r Rb3

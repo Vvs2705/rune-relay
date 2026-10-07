@@ -1,0 +1,14 @@
+// L029: duplo + simples + comporta | gerado (semente 29042) giraveis=7 toques=11 combinacoes=8192
+q bdbcbd
+q bcbcb
+q aaaaaa
+.   .   Rb3 L1r L0f .
+.   .   .   I1r .   .
+Rb3 L2f S1  Y11 .   .
+L1f +   I0r Y20 L0r .
+Rc1 G00 .   .   L1r Rd2
+L1f Y10 Rc2 .   .   .
+I1r L0f L3f .   .   Ra6
+L0f S3  .   .   .   I1r
+I1f .   .   .   S1  L3f
+.   .   .   .   I0f .

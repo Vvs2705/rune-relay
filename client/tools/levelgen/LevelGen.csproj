@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Gerador de niveis por construcao. Usa o RR.Core do jogo (mesmos .cs), entao nao duplica nenhuma regra.
+       Uso: dotnet run (dentro de client/tools/levelgen); grava L011..L030 em Assets/_RR/Resources/Levels. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Assets/_RR/Scripts/Core/**/*.cs" />
+  </ItemGroup>
+</Project>

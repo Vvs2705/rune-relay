@@ -1,0 +1,9 @@
+// L015: alternador + comporta | gerado (semente 15000) giraveis=5 toques=5 combinacoes=64
+h A comporta pode estar depois do alternador.
+q bcbc
+q aa
+S2  L1f I0r I0r Rb2 .
+L0f Y10 L1f I0r G12 S3
+.   I0f L0f I0r Ra2 .
+.   I1r .   .   .   .
+.   Rc2 .   .   .   .

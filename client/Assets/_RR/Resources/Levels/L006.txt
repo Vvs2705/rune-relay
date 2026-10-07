@@ -1,0 +1,9 @@
+// L006: comporta; o azul cheio abre a via do vermelho (cadeia)
+h A comporta só abre quando o cristal da cor dela enche. Até lá, os orbes esperam.
+q aaa
+q bbb
+.   .   .   .   .
+S1  I0r I1f Ra3 .
+.   .   .   .   .
+S1  I1f G10 I0r Rb3
+.   .   .   .   .

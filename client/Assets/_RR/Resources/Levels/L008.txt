@@ -1,0 +1,10 @@
+// L008: alternador, a seta vira sozinha e separa a fila (o sort)
+h O alternador manda cada orbe para um lado, alternando. Toque nele para escolher o primeiro lado.
+q abab
+.   .   .   .   .
+.   .   .   .   .
+.   Ra2 .   Rb2 .
+.   I1r .   I0f .
+.   L3r Y01 L2r .
+.   .   I0f .   .
+.   .   S0  .   .

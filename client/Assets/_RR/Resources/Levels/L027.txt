@@ -1,0 +1,14 @@
+// L027: dois alternadores, duas comportas | gerado (semente 27000) giraveis=7 toques=10 combinacoes=4096
+q cbcb
+q aaa
+q dada
+.   .   L0f .   .   .
+I1f S1  L0r .   .   .
+Rb2 I0r Y21 I0r Rc2 .
+.   .   L3r L1r .   .
+.   .   Ra3 L0f G13 S3
+.   .   .   .   .   Rd2
+.   .   .   .   .   I0f
+.   .   .   .   .   G00
+.   .   .   S1  I0r Y10
+.   .   Ra2 I0r I1f L3f

@@ -1,0 +1,9 @@
+// L024: tres fontes, quatro cores | gerado (semente 24007) giraveis=7 toques=9 combinacoes=1024
+q bbb
+q aa
+q dcd
+.   Ra2 .   L1f .   Rc1
+.   I1r .   S1  L0r I1r
+Rb3 +   G13 I0r L3f I1r
+S1  L3f Rd2 I0r Y01 L2r
+.   .   I0f S1  L3f .

@@ -45,6 +45,8 @@ Flags de dev do executável:
 - `-level N`: abre direto no nível N.
 - `-shot foto.png`: tira uma foto e sai. Combina com `-solve` (aplica a solução), `-release` (libera) e `-shotdelay 2.5` (espera antes da foto).
 - `-screen menu`: abre na seleção de níveis (para fotografar o menu).
+- `-record pasta [-recordsec s] [-recordfps n]`: grava um PNG por quadro (2× a janela, 1080×1920) e o áudio do jogo (`audio_48000_2.f32`) com tempo fixo (`captureFramerate`) e sai. A janela precisa estar visível.
+- `-demo "passos"`: roteiro de criativo (`wait:s`, `solve[:passo]`, `almost[:passo]`, `tap:x,y`, `release`); com `-record`, o vídeo acaba junto com o roteiro. Receita completa: `docs/CRIATIVOS.md`.
 
 Checklist visual do que conferir nas fotos: `client/docs_view_QA.md`.
 
@@ -112,7 +114,7 @@ Para mudar um nível: edite a especificação e regere; para um nível à mão, 
    - **Passa:** ≥50% terminam o nível 10 por vontade própria, e ≥30% falham pelo menos uma vez nos níveis 9–10.
    - **Refuta (ir para o plano B, Skyhold-lite):** mais de 25% não apertam LIBERAR sozinhos no nível 2, ou a mediana dos níveis 8–10 passa de 3 min.
    - Ler os diários com `python client/tools/diario_report.py playtest/` (ver seção Playtest).
-2. **8–10 criativos de 9:16** (`adb shell screenrecord`) mostrando orbes fluindo e se ordenando. O gate de marketability vem antes de qualquer meta.
+2. **8–10 criativos de 9:16** mostrando orbes fluindo e se ordenando. O gate de marketability vem antes de qualquer meta. **4 feitos** (#1, #5, #7, #10, gravados do build real com `-record`/`-demo`): `client/Builds/creatives/` e `docs/CRIATIVOS.md`. Faltam #2, #4 e #8 (dá com o `-demo` atual); #6 e #9 dependem de medidor e meta que o jogo ainda não tem.
 3. ~~Gerador de níveis~~ feito (30 níveis). Próximo: afinar a curva com o `diario.csv` do playtest e gerar L031+ se o D7 pedir.
 4. **v0.2, só depois do gate M:** moedas, booster "Revelar runa" (o `-solve` já é o motor), rewarded "+1 liberação" (`Session.ExtraRelease` já existe), tela de restauração, AAB release e teste interno/fechado no Play.
 

@@ -5,6 +5,7 @@
 /Builds/*
 !/Builds/shots/
 !/Builds/shots2/
+!/Builds/creatives/
 /UserSettings/
 /tools/coretests/bin/
 /tools/coretests/obj/

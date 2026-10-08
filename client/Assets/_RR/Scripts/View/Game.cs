@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using RR.Core;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -17,7 +18,8 @@ namespace RR
     /// toque, HUD por codigo, tutorial dos niveis 1-2 e diario de playtest (persistentDataPath/diario.csv). Nasce
     /// sozinho em qualquer cena. Voltar (Esc / back do Android): nivel -> menu -> sair.
     /// Flags de dev: -level N | -screen menu | -autoplay (resolve todos pelo Solver, sai 0/1; nao cria view) |
-    /// -shot arquivo.png [-solve] [-release] [-shotdelay s].
+    /// -shot arquivo.png [-solve] [-release] [-shotdelay s] |
+    /// -record pasta [-recordsec s] [-recordfps n] (PNG por quadro em 2x + audio float32 cru, depois sai) | -demo "roteiro" (ver Demo).
     /// </summary>
     public sealed class Game : MonoBehaviour
     {
@@ -46,6 +48,9 @@ namespace RR
         Button _releaseBtn, _againBtn, _panelPrimary, _panelSecondary;
         Action _primaryAction, _secondaryAction;
         Coroutine _starsAnim;
+        string _rec;                       // -record: pasta dos quadros
+        int _recFrame, _recFrames, _recCh;
+        BinaryWriter _audio;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot()
@@ -76,6 +81,38 @@ namespace RR
             _menu.OnPlay = Load;
             _menu.OnSettingsChange = (k, v) => Log("settings_change", k, v ? "1" : "0");
             _tut = Tutorial.Create(null, _hud);
+
+            _rec = Arg("-record");
+            if (string.IsNullOrEmpty(_rec)) { _rec = null; return; }
+            int fps = Mathf.Max(1, (int)ArgF("-recordfps", 30f));
+            Time.captureFramerate = fps; // o tempo de jogo anda 1/fps por quadro, por mais lento que seja gravar
+            _recFrames = Mathf.RoundToInt(ArgF("-recordsec", 30f) * fps); // teto; com -demo o fim do roteiro para antes
+            _recCh = AudioSettings.speakerMode == AudioSpeakerMode.Mono ? 1 : 2; // ponytail: mono/estereo; 5.1 nao e' alvo
+            Directory.CreateDirectory(_rec);
+            _audio = new BinaryWriter(File.Create(Path.Combine(_rec, $"audio_{AudioSettings.outputSampleRate}_{_recCh}.f32")));
+            AudioRenderer.Start();
+        }
+
+        /// <summary>-record: um PNG por quadro (2x a janela) e o audio do quadro em float32 cru; sai depois de -recordsec.</summary>
+        void LateUpdate()
+        {
+            if (_rec == null) return;
+            if (_recFrame < _recFrames)
+            {
+                ScreenCapture.CaptureScreenshot(Path.Combine(_rec, $"f{_recFrame:00000}.png"), 2);
+                using (var buf = new NativeArray<float>(AudioRenderer.GetSampleCountForCaptureFrame() * _recCh, Allocator.Temp))
+                {
+                    AudioRenderer.Render(buf);
+                    foreach (float f in buf) _audio.Write(f);
+                }
+            }
+            else if (_recFrame == _recFrames + 2) // 2 quadros de folga para o ultimo PNG chegar ao disco
+            {
+                AudioRenderer.Stop();
+                _audio.Dispose();
+                Application.Quit(0);
+            }
+            _recFrame++;
         }
 
         void Start()
@@ -88,6 +125,8 @@ namespace RR
             else Load(_progress.Unlocked);
             string shot = Arg("-shot");
             if (!string.IsNullOrEmpty(shot)) StartCoroutine(Shot(shot));
+            string demo = Arg("-demo");
+            if (!string.IsNullOrEmpty(demo)) StartCoroutine(Demo(demo));
         }
 
         void Load(int i)
@@ -151,15 +190,22 @@ namespace RR
             }
             if (_busy || p == null || !p.press.wasPressedThisFrame) return;
             Vector3 w = _cam.ScreenToWorldPoint(p.position.ReadValue());
-            if (!_view.CellAt(w, out int x, out int y) || !_s.Tap(x, y)) return;
+            if (_view.CellAt(w, out int x, out int y)) TapCell(x, y);
+        }
+
+        /// <summary>Toque do jogador numa celula (dedo ou roteiro -demo). false = nao era tocavel.</summary>
+        bool TapCell(int x, int y)
+        {
+            if (!_s.Tap(x, y)) return false;
             HideFailCard();
             _view.OnTap(x, y, _s.Board.At(x, y));
             _view.ShowPlanning(_s.Board);
             Sfx.Play("tap", 1f + 0.06f * (_s.Taps % 4));
             RefreshTutorial();
-            if (_firstMove) return;
+            if (_firstMove) return true;
             _firstMove = true;
             Log("first_move", ((Time.time - _levelStart) * 1000f).ToString("0", CultureInfo.InvariantCulture));
+            return true;
         }
 
         void Release()
@@ -457,34 +503,103 @@ namespace RR
             return i + 1 < a.Length && !a[i + 1].StartsWith("-") ? a[i + 1] : "";
         }
 
+        static float ArgF(string name, float def) => Num(Arg(name), def);
+
+        static float Num(string s, float def) =>
+            !string.IsNullOrEmpty(s) && float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out float v) ? v : def;
+
         static IEnumerator After(float seconds, Action a)
         {
             yield return new WaitForSeconds(seconds);
             a();
         }
 
-        /// <summary>Aplica a solucao de menos toques (dev: -solve; vira o booster "Revelar runa" depois).</summary>
-        void ApplySolution()
+        /// <summary>
+        /// Aplica a solucao de menos toques (dev: -solve; vira o booster "Revelar runa" depois). `step` 0 = de uma vez,
+        /// sem som; &gt;0 = um toque a cada `step` s, com o anel do tutorial marcando a peca antes (parece um dedo).
+        /// `leaveOne` deixa a peca de FailVar a 1 toque da solucao.
+        /// </summary>
+        IEnumerator Solve(float step, bool leaveOne)
         {
             Solver.Result r = Solver.Solve(_s.Board);
-            if (r.Best == null) return;
+            if (r.Best == null) yield break;
+            int keep = leaveOne ? FailVar(r) : -1;
             for (int j = 0; j < r.Vars.Count; j++)
             {
-                int cell = r.Vars[j], x = cell % _s.Board.W, y = cell / _s.Board.W;
-                while (_s.Board.Cells[cell].State != r.Best[j] && _s.Tap(x, y)) _view.OnTap(x, y, _s.Board.At(x, y));
+                int cell = r.Vars[j], x = cell % _s.Board.W, y = cell / _s.Board.W, n = _s.Board.Cells[cell].States;
+                int target = j == keep ? (r.Best[j] + n - 1) % n : r.Best[j];
+                while (_s.Board.Cells[cell].State != target)
+                {
+                    if (step <= 0f) { if (!_s.Tap(x, y)) break; _view.OnTap(x, y, _s.Board.At(x, y)); continue; }
+                    _tut.PointWorld(_view.CellWorld(x, y));
+                    yield return new WaitForSeconds(step);
+                    if (!TapCell(x, y)) break;
+                }
             }
             _view.ShowPlanning(_s.Board);
             RefreshTutorial();
         }
 
+        /// <summary>A peca que, a 1 toque da solucao, falha do jeito mais legivel: cor errada antes de derrame, e o mais tarde possivel.</summary>
+        int FailVar(Solver.Result r)
+        {
+            int best = -1, bestScore = -1;
+            for (int j = 0; j < r.Vars.Count; j++)
+            {
+                Board b = _s.Board.Clone();
+                for (int k = 0; k < r.Vars.Count; k++) b.Cells[r.Vars[k]].State = r.Best[k];
+                ref Tile t = ref b.Cells[r.Vars[j]];
+                t.State = (t.State + t.States - 1) % t.States;
+                var sim = new FlowSim(b);
+                sim.Run();
+                int score = (sim.Outcome == Outcome.WrongColor ? 1000 : 0) + sim.Tick;
+                if (score > bestScore) { bestScore = score; best = j; }
+            }
+            Debug.Log($"DEMO almost: peca ({r.Vars[best] % _s.Board.W},{r.Vars[best] / _s.Board.W}) fica errada");
+            return best;
+        }
+
+        /// <summary>
+        /// Dev: roteiro de criativo (-demo "almost wait:0.4 release solve:0.5 release"). Passos separados por espaco:
+        /// wait:s | solve[:step] (padrao 0.15) | almost[:step] (padrao 0 = ja comeca assim) | tap:x,y | release
+        /// (libera e espera a cascata acabar e o tabuleiro voltar ao planejamento). Com -record, o video acaba junto com o roteiro.
+        /// </summary>
+        IEnumerator Demo(string script)
+        {
+            yield return null;
+            foreach (string step in script.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] kv = step.Split(':');
+                string arg = kv.Length > 1 ? kv[1] : "";
+                switch (kv[0])
+                {
+                    case "wait": yield return new WaitForSeconds(Num(arg, 1f)); break;
+                    case "solve": yield return Solve(Num(arg, 0.15f), false); break;
+                    case "almost": yield return Solve(Num(arg, 0f), true); break;
+                    case "tap":
+                        string[] xy = arg.Split(',');
+                        int x = (int)Num(xy[0], -1f), y = (int)Num(xy.Length > 1 ? xy[1] : "", -1f);
+                        _tut.PointWorld(_view.CellWorld(x, y));
+                        yield return new WaitForSeconds(0.15f);
+                        TapCell(x, y);
+                        break;
+                    case "release":
+                        Release();
+                        while (_sim != null) yield return null;
+                        break;
+                    default: Debug.LogWarning($"DEMO passo desconhecido: {step}"); break;
+                }
+            }
+            if (_rec != null) _recFrames = Mathf.Min(_recFrames, _recFrame); // com -record, o fim do roteiro encerra o video
+        }
+
         IEnumerator Shot(string path)
         {
-            string d = Arg("-shotdelay");
-            float delay = !string.IsNullOrEmpty(d) && float.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out float v) ? v : 1f;
+            float delay = ArgF("-shotdelay", 1f);
             yield return null;
             if (_s != null && !_menu.Visible)
             {
-                if (Arg("-solve") != null) ApplySolution();
+                if (Arg("-solve") != null) yield return Solve(0f, false);
                 if (Arg("-release") != null) Release();
             }
             yield return new WaitForSeconds(delay);

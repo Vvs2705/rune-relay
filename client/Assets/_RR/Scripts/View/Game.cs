@@ -172,7 +172,8 @@ namespace RR
         {
             if (_cam == null) return;
             if (_s != null && (_screen.x != Screen.width || _screen.y != Screen.height)) Fit();
-            bool back = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
+            // Input.GetKeyDown: com o GameActivity o voltar do Android nao chega ao Input System, so ao Input Manager legado (Setup: Both)
+            bool back = Input.GetKeyDown(KeyCode.Escape) || (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame);
             if (_menu.Visible)
             {
                 if (back) { if (_menu.SettingsOpen) _menu.CloseSettings(); else Application.Quit(); }

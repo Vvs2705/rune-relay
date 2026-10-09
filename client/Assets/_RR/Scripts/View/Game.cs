@@ -172,7 +172,11 @@ namespace RR
         {
             if (_cam == null) return;
             if (_s != null && (_screen.x != Screen.width || _screen.y != Screen.height)) Fit();
+            // Input.GetKeyDown: com o GameActivity o voltar do Android nao chega ao Input System, so ao Input Manager legado (Setup: Both)
             bool back = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
+#if ENABLE_LEGACY_INPUT_MANAGER
+            back |= Input.GetKeyDown(KeyCode.Escape);   // sem o legado (handler 1) o Input.* lanca toda chamada e derruba o Update inteiro
+#endif
             if (_menu.Visible)
             {
                 if (back) { if (_menu.SettingsOpen) _menu.CloseSettings(); else Application.Quit(); }

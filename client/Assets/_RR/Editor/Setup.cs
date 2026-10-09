@@ -60,10 +60,18 @@ namespace RR.EditorTools
 
         public static void BuildWindows() => Build(BuildTarget.StandaloneWindows64, "Builds/win/RuneRelay.exe");
         public static void BuildAndroidDev() => Build(BuildTarget.Android, "Builds/android/RuneRelay-dev.apk");
+        // Emulador do PC (x86_64): o berberis do Android 15 derruba o ARM64 traduzido do Unity/IL2CPP (Forge Street, 2026-10-08).
+        // ponytail: APK so de teste local; aparelho e Play recebem so ARM64 (BuildAndroidDev).
+        public static void BuildAndroidEmu() => Build(BuildTarget.Android, "Builds/android/RuneRelay-emu.apk", AndroidArchitecture.X86_64);
 
-        static void Build(BuildTarget target, string path)
+        static void Build(BuildTarget target, string path, AndroidArchitecture arch = AndroidArchitecture.None)
         {
             Apply();
+            if (arch != AndroidArchitecture.None) PlayerSettings.Android.targetArchitectures = arch;
+            // o empacotamento incremental do Gradle reaproveita o APK anterior: no Forge deixou ~12 MB de buracos e, alternando
+            // ARM64/x86_64, saiu APK sem libunity/libil2cpp (crash "libgame.so not found"). Apagar a saida custa ~1 min
+            const string gradleOut = "Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build";
+            if (target == BuildTarget.Android && Directory.Exists(gradleOut)) Directory.Delete(gradleOut, true);
             BuildReport r = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
                 scenes = new[] { Scene },
@@ -72,6 +80,7 @@ namespace RR.EditorTools
                 options = BuildOptions.Development,
             });
             Debug.Log($"BuildSummary({target}): result={r.summary.result} errors={r.summary.totalErrors} size={r.summary.totalSize} path={path}");
+            if (arch != AndroidArchitecture.None) { PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64; AssetDatabase.SaveAssets(); }   // nao vaza para o build do aparelho
             if (Application.isBatchMode) EditorApplication.Exit(r.summary.result == BuildResult.Succeeded ? 0 : 1);
         }
     }

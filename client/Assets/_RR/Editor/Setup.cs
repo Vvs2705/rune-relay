@@ -34,7 +34,7 @@ namespace RR.EditorTools
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;      // a Play exige 64 bits
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26; // ponytail: hipotese ate fixar o aparelho minimo
             PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
-            PlayerSettings.Android.predictiveBackSupport = true; // API 36: o voltar chega ao jogo como Esc
+            PlayerSettings.Android.predictiveBackSupport = true; // API 36: o voltar chega ao jogo como Esc (lido pelo Input legado, ver activeInputHandler)
 
             // Windows so' de dev: janela retrato para jogar e fotografar no PC.
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
@@ -42,10 +42,11 @@ namespace RR.EditorTools
             PlayerSettings.defaultScreenHeight = 960;
             PlayerSettings.resizableWindow = true;
 
-            // 1 = so' Input System (sem API publica; vale na proxima abertura do editor, como no COE).
+            // 2 = Input System + Input Manager legado (sem API publica; vale na proxima abertura do editor, como no COE). O legado e' so
+            // para o voltar do Android: com o GameActivity o Input System nao recebe a tecla (Forge Street, emulador API 35; forum Unity 1555368)
             var ps = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset")[0]);
             SerializedProperty handler = ps.FindProperty("activeInputHandler");
-            if (handler != null && handler.intValue != 1) { handler.intValue = 1; ps.ApplyModifiedPropertiesWithoutUndo(); }
+            if (handler != null && handler.intValue != 2) { handler.intValue = 2; ps.ApplyModifiedPropertiesWithoutUndo(); }
 
             if (!File.Exists(Scene))
             {
@@ -59,10 +60,18 @@ namespace RR.EditorTools
 
         public static void BuildWindows() => Build(BuildTarget.StandaloneWindows64, "Builds/win/RuneRelay.exe");
         public static void BuildAndroidDev() => Build(BuildTarget.Android, "Builds/android/RuneRelay-dev.apk");
+        // Emulador do PC (x86_64): o berberis do Android 15 derruba o ARM64 traduzido do Unity/IL2CPP (Forge Street, 2026-10-08).
+        // ponytail: APK so de teste local; aparelho e Play recebem so ARM64 (BuildAndroidDev).
+        public static void BuildAndroidEmu() => Build(BuildTarget.Android, "Builds/android/RuneRelay-emu.apk", AndroidArchitecture.X86_64);
 
-        static void Build(BuildTarget target, string path)
+        static void Build(BuildTarget target, string path, AndroidArchitecture arch = AndroidArchitecture.None)
         {
             Apply();
+            if (arch != AndroidArchitecture.None) PlayerSettings.Android.targetArchitectures = arch;
+            // o empacotamento incremental do Gradle reaproveita o APK anterior: no Forge deixou ~12 MB de buracos e, alternando
+            // ARM64/x86_64, saiu APK sem libunity/libil2cpp (crash "libgame.so not found"). Apagar a saida custa ~1 min
+            const string gradleOut = "Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build";
+            if (target == BuildTarget.Android && Directory.Exists(gradleOut)) Directory.Delete(gradleOut, true);
             BuildReport r = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
                 scenes = new[] { Scene },
@@ -71,6 +80,7 @@ namespace RR.EditorTools
                 options = BuildOptions.Development,
             });
             Debug.Log($"BuildSummary({target}): result={r.summary.result} errors={r.summary.totalErrors} size={r.summary.totalSize} path={path}");
+            if (arch != AndroidArchitecture.None) { PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64; AssetDatabase.SaveAssets(); }   // nao vaza para o build do aparelho
             if (Application.isBatchMode) EditorApplication.Exit(r.summary.result == BuildResult.Succeeded ? 0 : 1);
         }
     }

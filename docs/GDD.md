@@ -587,3 +587,169 @@ Resumo. O porquê, o custo detalhado, os riscos e a validação de cada um estã
 | D6 | Jogadores criam e trocam níveis | Só depois do D7 ≥ 5%: protótipo de editor com 10 testers | ≥ 3 de 10 criam um nível válido sem ajuda | Nenhum cria |
 
 Instrumentação já prevista na §14 (revisão). Nada aqui roda antes do playtest Camada 0 e do Gate M.
+
+---
+
+## Lições do estúdio aplicadas a Rune Relay (do Dungeon Courier, 2026-10-16)
+
+Estado: PROPOSTO · nada aqui foi implementado ou medido · vale quando o Vinicius retomar o jogo (o portfólio termina o Forge Street antes) · não altera as seções 1–28.
+
+O Dungeon Courier (DC, repositório `Vvs2705/dungeon-courier`) chegou à 1.4.1-beta com o GDD inteiro feito. O que funcionou e o que custou caro está no playbook [`LICOES_PARA_O_ESTUDIO.md`](https://github.com/Vvs2705/dungeon-courier/blob/main/docs/LICOES_PARA_O_ESTUDIO.md); a cópia fica na memória do estúdio (`C:\Users\VINICIUS\Videos\MEUS PROJETOS\Agentes\_memoria\PLAYBOOK_ESTUDIO_DUNGEON_COURIER.md`, ao lado de `rune-relay.md`).
+
+O Rune Relay é um puzzle **sem personagem**. Por isso a metade de arte 3D do playbook (Tripo, Mixamo, sprites de elenco) quase não se aplica, e isso está dito onde aparece. As lições que mais rendem aqui são:
+- tutorial guiado;
+- contrato da v0.2;
+- arte de interface pintada de graça;
+- privacidade simples, que não atrasa o 1º toque;
+- loja e criativos em pt/en/id para o Gate M (BR/PH/ID).
+
+Formato de cada item: **o que fazer neste jogo** · **por quê** (o que aconteceu no DC) · **reaproveitar** (caminho no repositório do DC).
+
+**O que o Rune Relay já tem (conferido em 2026-10-16; não refazer):**
+- **Núcleo e testes:** C# puro (`Board`, `FlowSim`, `Solver`, `Session`), com 46 testes e CI nos PRs. `-autoplay` resolve tudo pelo Solver (`AUTOPLAY OK 30/30`).
+- **Níveis:** gerador com prova de solução única e o portão de conteúdo `LevelsContentTests`.
+- **Playtest:** diário com `diario_report.py`, que já aplica o portão da Camada 0.
+- **Captura:** `-shot`, `-record`, `-demo`, `-level` e `-screen menu`.
+- **Som:** SFX sintetizados; a lição do `audio_gen.py` do DC já está cumprida.
+- **Visual:** sprites procedurais em `Art.cs`, com zero asset; cada cor com forma própria (D7).
+- **Tela:** `Screen.safeArea` e CanvasScaler 1080×1920.
+- **Ensino:** "mão fantasma" (anel) nos níveis 1–2 (`Tutorial.cs`).
+
+### Processo
+1. **Contrato da v0.2 antes de codar.**
+   - **O que fazer:** escrever o `docs/CONTRATO_V02.md` com:
+     - o escopo: lista do §20, a decisão do §6.1, os diferenciais D3, D2 e D1;
+     - os números iniciais (moedas por estrela, preço do booster, teto de rewarded);
+     - o critério de pronto;
+     - uma matriz "GDD × feito", com uma linha por item do §18–§20, do §27 e dos eventos do §14.
+   - **Por quê:** no DC, com o contrato escrito antes, o núcleo e a View andaram em paralelo sem quebrar a API. O jogo só foi dado por pronto quando todas as linhas da matriz fecharam.
+   - **Reaproveitar:** `docs/CONTRATO_V01.md` e `docs/CONTRATO_LANCAMENTO.md` §1.
+2. **Memória de retomada.** No `rune-relay.md` da memória, manter um bloco "CONTINUAR DAQUI" com a decisão pendente do §6.1 e os comandos do portão. **Por quê:** o Vinicius retoma com "vamos continuar"; sem o bloco, a sessão reabre a investigação.
+
+### Código e testes
+1. **`-testsession`.**
+   - **O que fazer:** criar a flag. Ela não lê nem grava o `Progress` (PlayerPrefs), não escreve no `diario.csv` e usa semente fixa. `-shot`, `-record` e `-demo` passam a ligá-la sozinhos.
+   - **Por quê:** hoje uma vitória no `-demo` ou no `-shot -solve -release` grava estrelas (`Game.EndSim`) e linhas no diário. Os criativos gravados no PC sujam o save e o funil da Camada 0. No DC, o `-testsession` deixou fotos da loja, criativos e QA saírem do jogo real sem tocar no save.
+   - **Reaproveitar:** a mesma checagem do `Game.cs` do DC.
+2. **Idiomas pt/en/id desde a v0.2.**
+   - **O que fazer:** criar `-lang pt|en|es|id` e textos num lugar só, `L(pt, en, es, id)`, com frase inteira por idioma e números por `{0}`. A dica `h` dos níveis hoje é só pt; o formato de nível ganha `h.en`/`h.id` (ou uma tabela por id de nível), e o portão de conteúdo recusa nível sem a dica nos 3 idiomas.
+   - **Por quê:** o Gate M roda em BR, PH e ID (§15.1); criativo e loja em português não medem as Filipinas nem a Indonésia. O DC fez as 4 línguas e as fotos por idioma.
+   - **Reaproveitar:** `client/Assets/_DC/Scripts/View/Textos.cs`.
+3. **Bot de economia.**
+   - **O que fazer:** usar o Solver como bot e acrescentar um perfil "erra a 1ª liberação em 1 de cada N níveis", com `-autoplay N` imprimindo moedas por dia, sequência média e o valor do rewarded nas opções A, B e C do §6.1.
+   - **Por quê:** no DC, o bot e o `-autoplay` alimentam o `BALANCE.md` e o portão. A duração real se mede com gente (diário), mas a economia se mede antes, sem custo.
+   - **Reaproveitar:** o padrão `Bot` + `-autoplay N` do DC; o `econsim` do Forge.
+4. **Portão de um comando**, quando Ads e IAP entrarem: `dotnet test coretests` + `viewcheck` (compila a View fora do Unity) + EditMode + build + `-autoplay` + fotos 540×960. **Atenção:** o dotnet usa NUnit 3.14 e o Unity usa 3.5; uma tupla `int × long` passa num e falha no outro, então rode o EditMode antes do PR. **Reaproveitar:** `client/tools/viewcheck` do DC.
+5. **Tabelas da View indexadas por enum, com reserva procedural.** O §10 prevê 8–10 famílias de tiles. Uma peça nova sem linha de arte cai num desenho procedural em vez de dar `IndexOutOfRange`. **Reaproveitar:** o padrão do `Art.cs` e do `WorldView.cs` do DC.
+
+### Arte e animação
+- **Não se aplica (honesto):** o pipeline Tripo → Mixamo → Blender → sprites existe para elenco. O core do Rune Relay não tem personagem (§11: "VFX são mais importantes que personagens"), e nenhum clipe do DC, do ARKANA ou do Forge serve ao tabuleiro. **0 crédito de Tripo** na v0.2.
+- **Arte de interface pintada no gerador grátis** (Nano Banana 2, 4 opções por peça, sobre azul-marinho liso, recortada por `client/tools/ui_assets.py` pela cor da borda):
+  - logo "RUNE RELAY";
+  - ícone do app com o alternador separando a fila ●○ em duas cores (o D3 vira ícone);
+  - fundo da Sala de Condução e das salas seguintes (§4 e §10);
+  - os 50–80 artefatos de restauração do §10, em folhas 4×3 (12 por folha, 5 a 7 folhas, cortadas em células).
+  - **Por quê:** no DC, logo, 20 ícones, fundo do menu e retratos saíram assim, sem crédito, e ficaram mais vistosos que render recortado.
+- **Sala "apagada → restaurada" por troca de cor, 0 crédito.** É a mesma pintura escurecida e dessaturada no estado quebrado e na cor cheia no restaurado, com o artefato restaurado acendendo por cima. **Por quê:** o DC fez variantes por matiz, saturação e brilho direto na imagem, sem gerar de novo. **Reaproveitar:** `client/tools/roupas_cor.py` (`recolor`) e `roupas_2d.py`.
+- **As peças do tabuleiro continuam procedurais** (`Art.cs`): pintura só em volta do tabuleiro. A leitura (cor + forma, seta do alternador) vale mais que o enfeite.
+- **Personagem, só se o Vinicius aprovar uma guardiã do observatório** para o cartão de contexto: um retrato pintado (grátis), sem modelo 3D. Um guardião animado em 3D (65 créditos, com os clipes de magia do ARKANA `mixamo-standing-1h-cast-spell-01.fbx` e o Breathing Idle do Forge) não se justifica antes de D7 ≥ 5%.
+
+### Interface e marca
+- **Fontes OFL.**
+  - **O que fazer:** trocar a `LegacyRuntime.ttf` (`Art.Font()`) por Lilita One (títulos, LIBERAR) e Nunito ExtraBold (corpo), em `Resources/Fonts` com a licença junto.
+  - **Por quê:** no DC (e no Forge, #87), as fontes OFL com a licença junto deram a cara da interface v2. O Latin-1 cobre pt, en, es e id.
+  - **Reaproveitar:** os arquivos em `client/Assets/_DC/Resources/Fonts`.
+- **9-fatias procedurais.** O `Art.cs` do DC gera, por código:
+  - `Botao`, com relevo, para o LIBERAR;
+  - `Moldura` e `Pergaminho`, para os painéis de vitória e falha;
+  - `Contorno`, para o tour;
+  - `Balao`, para a fala;
+  - e ainda `Aperta` (escala 0,95 no toque) e `Letreiro` (contorno e sombra no contador de liberações e nas estrelas).
+
+  O `Art.cs` do Rune já gera formas; falta o painel 9-fatias. **Reaproveitar:** `client/Assets/_DC/Scripts/View/Art.cs`.
+- **Ícone adaptativo.** O `Setup.cs` do Rune não define ícone. **O que fazer:** copiar o `Setup.Icones` (fundo + frente, figura a no máximo 0,64 da camada), conferir nas máscaras círculo, squircle e quadrado (`client/tools/icone_app.py`) e, no APK, com `aapt2 dump badging`.
+- **Telas 20:9 e alvo de toque.**
+  - **20:9:** fora do tabuleiro, continue o fundo da sala escurecido, não o `Rock` liso (`0x080A12`). No DC, faixa lisa pareceu bug.
+  - **Toque:** peça girável com pelo menos 48 dp (`Dp` do DC). O maior nível hoje tem 6 colunas (L029), que dá cerca de 60 dp numa tela de 360 dp. Acrescente ao `LevelsContentTests` um teto de 7 colunas para o L031+.
+
+### Onboarding
+**Tour guiado** (obrigatório no estúdio desde o DC). Substitui a mão fantasma de hoje:
+- a tela congela e só o alvo fica aceso (véu com buraco, contorno dourado e seta);
+- um cartão de 1–2 linhas diz o que é, quando usar e por quê;
+- nos passos de ação, só o alvo responde;
+- cada passo aparece uma vez (PlayerPrefs `rr.tour`), com "Pular tutorial" e "REVER TUTORIAL" nas Configurações (o painel de som e vibração já existe);
+- fica desligado no `-autoplay`, no `-record`, no `-demo` e no `-shot`, e o `-tutorial` liga;
+- passo de botão se cancela se a tela mudar (voltar ao menu no meio do L001).
+
+O alvo das peças continua vindo do Solver, como na mão fantasma. **Reaproveitar:** `client/Assets/_DC/Scripts/View/Tour.cs` (genérico: troque só a lista de passos e os gatilhos).
+
+| # | Nível · tipo | Alvo | Cartão · por quê |
+|---|---|---|---|
+| 1 | L001 · ação, com a fala da guardiã | a peça que falta girar | "O observatório apagou. Gire a runa clara para levar a mana ao cristal." · contexto e verbo no mesmo cartão: 1º toque < 10 s (§2) |
+| 2 | L001 · ação | LIBERAR | "Pronto? Libere a fila e assista." · ensina "planejar e assistir", o hook do §1 |
+| 3 | L002 · ação | a tela durante a cascata | "Segure para acelerar." · cascata longa cansa quem já entendeu |
+| 4 | L002 · explicação | o caminho aceso | "O caminho aceso mostra por onde o próximo orbe vai." |
+| 5 | L003 · explicação | a fila da fonte e os cristais | "Cada cor no seu cristal. Cada cor tem forma própria." · D7, acessível |
+| 6 | 1ª falha (o L005 é a armadilha) · explicação | o contador de liberações e o motivo | "O tabuleiro voltou com seus giros. Você tem 3 liberações; as estrelas contam em qual venceu." · falha que ensina, sem punir (com a opção A do §6.1: "recomeçar não devolve liberações") |
+| 7 | L004 · explicação | o cruzamento | "No cruzamento, os fluxos passam sem misturar." |
+| 8 | L006 · explicação | a comporta e a linha até o cristal que a abre | "A comporta só abre quando aquele cristal enche. Até lá, os orbes esperam." |
+| 9 | L008 · ação | o alternador | "O alternador manda um orbe para cada lado. Toque para escolher o primeiro." · é a assinatura (D3) e precisa ser o passo mais claro |
+| 10 | L009 · explicação | o ramo apagado | "O outro lado também precisa estar certo." |
+| 11 | v0.2, 1ª oferta "+1 liberação" · explicação | o botão do rewarded | "Opcional: uma liberação extra." · transparência (§7) |
+| 12 | v0.2, depois do L010 · explicação com a fala da guardiã | a Sala de Condução e, depois, o Desafio do Dia | "A Sala de Condução acendeu! Volte amanhã para o desafio do dia." · fecha o ciclo aberto no passo 1 |
+
+- **Cartão de contexto no lugar da animação de abertura.**
+  - **O que fazer:** o §3 (0:00–0:30) prevê uma "animação curtíssima de observatório apagado". O DC trocou cutscene por um cartão do personagem com retrato pintado e balão de fala. Aqui ele nem soma tempo: a fala da guardiã é o próprio passo 1, e o observatório apagado é o fundo do L001. A cena de fecho é a sala acendendo (passo 12).
+  - **Por quê:** no DC, cutscene mais tutorial viraram parede de texto e atrasaram o 1º toque. Num puzzle com meta de 1ª ação < 10 s, isso pesa mais ainda.
+- **Controle:** só toque, então a lição do joystick invisível não se aplica. O equivalente: o anel e a seta do tour **nunca tampam a peça nem a seta do alternador** (anel em volta, seta vindo de fora), e o cartão fica fora do tabuleiro. **Por quê:** no DC, o desenho do controle tampava o personagem, e só as fotos mostraram.
+
+### Monetização e compliance
+- **Confronto do GDD com os guardrails:**
+  - **Nada aleatório pago:** cumpre. O baú diário tem conteúdo fixo e visível (revisão do §7), e não há booster pago em corrida.
+  - **Rewarded opcional:** cumpre ("+1 liberação", dobrar moedas, proteger a sequência; teto de 5 por dia).
+  - **Interstitial:** cumpre. Fica desligado na v0.1 e na v0.2 entra por RemoteConfig depois do L12–15.
+  - **1 moeda:** cumpre no MVP (Coins). Os Crystals e as vidas da opção C estão em Conflitos.
+- **Anúncio não personalizado para todos e sem `AD_ID`.**
+  - **O que fazer:** chamar `LevelPlayPrivacySettings` antes do `Init` (GDPR sem consentimento, CCPA opt-out, COPPA desligado) e tirar do manifesto o `AD_ID` e as 3 permissões do Privacy Sandbox. Na Play, declarar ID de publicidade = não.
+  - **Por quê:** é o modelo do DC (decisão pelo ECA Digital) e dispensa tela de idade e consentimento antes do 1º toque. Uma tela dessas quebraria a meta de 1ª ação < 10 s.
+  - **Reaproveitar:** `client/Assets/_DC/Scripts/View/Anuncios.cs` (interface + simulador; sem chave, o jogo cai no simulador), `AnunciosLevelPlay.cs`, `Editor/Setup.cs` (`SemIdDePublicidade`) e `docs/MONETIZACAO.md` §4.
+- **IAP de conteúdo fixo** (Remove Ads, Starter, pacotes de moedas): Unity IAP 5.4.3 atrás de uma interface, com loja falsa no PC. A compra é em 2 passos: concede, grava e só então confirma. Restaurar compras. **Reaproveitar:** `client/Assets/_DC/Scripts/View/Loja.cs` e `LojaIap.cs`.
+- **Política de privacidade pública:** GitHub Pages, branch `gh-pages`, um `index.html` com pt/en/es/id que cita só as redes usadas. **Reaproveitar:** o `index.html` do `gh-pages` do DC.
+
+### Play e lançamento
+- **Conta:** usar a conta de **organização** da V-STACK, a mesma do DC, que espera o D-U-N-S (previsão 2026-11-25). O Internal e o Closed da v0.2 entram nela, sem conta pessoal. O Gate M (só criativos) não depende da Play. **Por quê:** no DC, tudo ficou pronto e só a conta falta; o pedido de D-U-N-S leva cerca de 30 dias úteis.
+- **Chave de upload:** nova, fora do git (`%USERPROFILE%\.rune-relay\`), com backup fora do PC. O appId `br.com.vstack.runerelay` não muda depois do 1º envio, como já diz o `Setup.cs`.
+- **AAB:** o `Setup.cs` do Rune só tem `BuildWindows` e `BuildAndroidDev`. **O que fazer:** copiar o `Setup.BuildAndroidBundle` do DC (targetSdk 36, bibliotecas nativas a 16 KB, versionCode derivado da versão).
+- **Loja e criativos refeitos do build:**
+  - **Hoje:** o Rune já grava com `-record`/`-demo` (`client/Builds/creatives/montar.py`).
+  - **O que fazer:** usar o `client/tools/criativos.py` do DC, que monta os vídeos 9:16 com legenda e CTA por idioma (pt/en/id para o Gate M), com os roteiros #2, #4, #8, #11 e #12 abrindo no LIBERAR (§17 e §25). `loja_fotos.sh` e `loja_assets.py` fazem as 8 capturas por idioma, a feature graphic 1024×500 e o ícone 512.
+  - **Regra:** criativo só de gameplay real.
+
+### Android
+- **vSync desligado.**
+  - **O que fazer:** acrescentar `QualitySettings.vSyncCount = 0;` ao lado do `Application.targetFrameRate = 60;` em `Game.cs`.
+  - **Por quê:** o padrão do Android aqui também é Medium com `vSyncCount: 1` (`QualitySettings.asset`). No DC, o mesmo ajuste levou o POCO F4 de 28–36 para 55 fps.
+- **APK de worktree via `subst R: <client>`:** o caminho com espaço (`MEUS PROJETOS`, `JOGOS NOVOS`) quebra o CMake do Gradle. Desfaça com `subst R: /D`.
+- **adb no Git Bash:** `adb shell "am start -n br.com.vstack.runerelay/<act> -e unity '-level 8 -tutorial'"`, com aspas por dentro.
+- **Aparelho e APK:** só o APK atual. Pergunte "pode testar?" antes de usar o celular e meça num aparelho original, não no POCO de 4 anos.
+
+### Conflitos com o GDD atual
+1. **§3, 0:00–0:30, "animação curtíssima de observatório apagado"** é cutscene antes do 1º toque. **Recomendação:** a fala da guardiã no passo 1 do tour, com o observatório apagado como fundo do L001.
+2. **§6.1, opção C: vidas com recarga por tempo** é o padrão "energia", que o estúdio evita e que lê o relógio do aparelho. **Recomendação:** opção A, ou B se o bot de economia mostrar que o rewarded perde valor. A decisão continua com o Vinicius.
+3. **§6, Crystals (2ª moeda) e IAP "coins/crystals":** o DC fechou o GDD inteiro com 1 moeda. **Recomendação:** Coins até a 1.0. Crystals só com um mapa fonte → ralo que o bot justifique (e com outro nome, como a revisão já pede).
+4. **§6, boosters "Preview Flow", "Freeze Overload" e "Undo+"** dependem de mecânicas que o adendo tirou (preview, sobrecarga, undo). **Recomendação:** cortar da lista, para não voltarem pela loja. O único booster do MVP é "Revelar runa".
+5. **§23, framework compartilhado `MobileCore`:** no DC, copiar os arquivos (`Anuncios`, `Loja`, `Textos`, `Exportar`, `Setup`) e trocar o namespace saiu mais barato que um pacote comum a 3 repositórios com versões de Unity e regras diferentes. **Recomendação:** copiar e adaptar; um pacote só quando o 3º jogo repetir a mesma mudança.
+
+### Primeiros passos recomendados (na retomada)
+1. Vinicius decide o §6.1; recomendação: A.
+2. Escrever o `docs/CONTRATO_V02.md` com a matriz GDD × feito.
+3. Criar o `-testsession`, ligado sozinho no `-shot`/`-record`/`-demo`, e acrescentar `QualitySettings.vSyncCount = 0`.
+4. Textos e dicas de nível em pt/en/id (`Textos.cs` do DC) e o portão de conteúdo cobrando os 3 idiomas.
+5. Tour guiado (`Tour.cs`) com a fala da guardiã no passo 1; fotos de cada passo; Camada 0 com o tour ligado.
+6. Fontes OFL, 9-fatias, ícone adaptativo e arte pintada grátis: logo, ícone, Sala de Condução apagada e acesa, 1ª folha de artefatos.
+7. Criativos do Gate M com o `criativos.py`, em pt/en/id, abrindo no LIBERAR (D3).
+8. Só depois do Gate M:
+   - LevelPlay não personalizado e sem `AD_ID`;
+   - IAP em 2 passos;
+   - política no `gh-pages`;
+   - AAB na conta V-STACK.

@@ -1,3 +1,9 @@
+> **Revisão 2026-11-27 (Conselho do TIME DE JOGOS) — veredito: SEGUIR COM AJUSTES.** Ata: [`conselho/2026-11-27-revisao-gdd.md`](conselho/2026-11-27-revisao-gdd.md); visão do portfólio: `JOGOS NOVOS/00_PESQUISA/CONSELHO_PORTFOLIO_2026-11-27.md`.
+> 1. **O jogo não precisa de mais GDD, precisa da Camada 0.** A v0.1 está pronta desde 2026-10-06 e o playtest nunca rodou. Rune Relay é o único puzzle do estúdio e o único gênero do portfólio sem jogo pronto para loja.
+> 2. **Camada 0 por link web (Unity WebGL no Cloudflare Pages)**, sem esperar a Play Console: o jogo é 100% procedural e roda no mesmo projeto. Detalhe no §29.
+> 3. **§6.1 decidido pelo conselho: opção A** (o contador de liberações persiste até a vitória). É a mesma regra que o Skyhold já adota, custa ≤ 1 dia e é reversível; o Vinicius pode trocar por B ou C.
+> 4. **Conflitos 1, 3, 4 e 5 da seção de lições resolvidos** conforme as recomendações dela (§29.3). Nada foi apagado.
+
 > **Revisão 2026-10-09 (comparativo de mercado):** o Rune Relay foi comparado com 9 similares reais de 2025–2026 (tabela, matriz de recursos, reclamações e fontes em [`COMPETITIVO.md`](COMPETITIVO.md)). O que mudou neste GDD:
 > 1. **Posicionamento (§1):** "fluxo" sozinho deixou de ser diferencial. O Pixel Flow! (Loom/Scopely) ocupa o "flow sort" e lidera o hybrid-casual de puzzle no H1/2026. O que é nosso: **planejar a rota e assistir à separação**, com o alternador dividindo uma fila misturada, sem sorte e com solução provada pelo solver. O alternador não é inédito (Trainyard, premium de 2010), mas nenhum hit hybrid-casual de 2025–2026 o usa.
 > 2. **Contradições com o adendo de 2026-10-06 resolvidas no próprio texto (§2, §3, §6, §7, §9):** undo, preview e medidor de sobrecarga riscados; 1 moeda no MVP; interstitial desligado na v0.1; boosters fora de qualquer corrida/ranking; baú só com conteúdo fixo.
@@ -753,3 +759,55 @@ O alvo das peças continua vindo do Solver, como na mão fantasma. **Reaproveita
    - IAP em 2 passos;
    - política no `gh-pages`;
    - AAB na conta V-STACK.
+
+
+---
+
+# 29. REVISÃO DO CONSELHO E PLANO A PARTIR DE 2026-11-27
+
+## 29.1 Estado real (matriz curta)
+
+| Item | Estado | Evidência |
+|---|---|---|
+| Núcleo, solver, gerador, 30 níveis | feito | `README.md` (46 testes, autoplay 30/30) |
+| View v2, menu, tutorial de anel, SFX | feito | `client/Assets/_RR/Scripts/View/` |
+| 4 criativos gravados do build (#1, #5, #7, #10) | feito | `docs/CRIATIVOS.md` |
+| PR #3 (voltar do Android) | aberto desde 2026-10-09 | `fix/android-voltar` |
+| Camada 0 (10–20 pessoas) | **não feita** | nenhum `diario.csv` coletado |
+| Exploit do "Recomeçar" (§6.1) | **decidido: opção A**, código pendente | esta revisão |
+| Unity | 6000.3.23f1 (o estúdio já está no 27f1) | `ProjectVersion.txt` |
+
+## 29.2 Ordem de trabalho (cada passo é um PR)
+
+1. **Fechar o PR #3** (voltar do Android) com o portão verde.
+2. **Opção A do §6.1** no `Session`/`Progress` + 1 teste negativo nomeado `Recomecar_NaoDevolveTresEstrelas`, visto vermelho antes do conserto.
+3. **`-testsession` e `vSyncCount = 0`** (conflito do Android, já recomendado na seção de lições).
+4. **Build WebGL da Camada 0** (`Setup.BuildWebGL`, `-executeMethod`):
+   - o diário vai para o IndexedDB do navegador, então o painel de configurações ganha **"Copiar diário"** (texto CSV para a área de transferência) e o testador cola no WhatsApp;
+   - hospedagem no **Cloudflare Pages** (grátis, aceita repo privado; link só para os testadores);
+   - critério técnico, **NÃO AVALIADO até medir:** abre em ≤ 15 s no 4G de um Android de entrada, 30 FPS estáveis na cascata, toque sem atraso perceptível.
+5. **Tour guiado** (`Tour.cs` do DC) no lugar do anel dos níveis 1–2, com o passo 1 do conflito 1 (sem cutscene).
+6. **Camada 0 com 15–20 pessoas**, lida pelo `diario_report.py` e pelo portão que já está no README (≥ 50% terminam o nível 10; ≥ 30% falham nos níveis 9–10; refuta com > 25% sem LIBERAR no nível 2 ou mediana > 3 min nos níveis 8–10).
+7. Só depois da Camada 0 aprovada: Gate M (criativos #1, #5, #9 e o D3 do §27) e a v0.2 do §20.
+
+**Atualizar para o Unity 6000.3.27f1** num PR separado, depois do passo 6, para não misturar mudança de editor com a leitura do playtest.
+
+## 29.3 Conflitos da seção de lições, resolvidos
+
+| # | Conflito | Decisão | Domínio |
+|---|---|---|---|
+| 1 | cutscene do observatório antes do 1º toque | vira fundo do L001 + fala da guardiã no passo 1 do tour | criativo |
+| 2 | §6.1 A × B × C | **A agora**; B só se o bot de economia mostrar o rewarded sem valor; C (vidas) fica vetada no MVP | criativo, reversível pelo Vinicius |
+| 3 | Crystals como 2ª moeda | Coins até a 1.0; a 2ª moeda só com mapa fonte → ralo justificado pelo bot e com outro nome | producer (guardrail) |
+| 4 | boosters Preview Flow, Freeze Overload, Undo+ | cortados; o único booster do MVP é "Revelar runa" | criativo |
+| 5 | pacote `MobileCore` | não criar; copiar e adaptar os arquivos do DC e do Little Terminal | técnico |
+
+## 29.4 O que veio dos outros jogos desde 2026-10-16
+
+- **Little Terminal:** GameCI no CI (EditMode e build de dev em todo PR, com `UNITY_LICENSE` nos segredos). Copiar o `unity.yml` quando a v0.2 começar; até lá, o `nucleo.yml` basta.
+- **Little Terminal:** LevelPlay 9.6 entra no Gradle pelo `Setup`, sem resolvedor e sem `ads-identifier`. É a receita da v0.2 do §20.
+- **Dungeon Courier:** o editor 6000.3.27f1 com Input System 1.20.1 passou no portão inteiro; é o caminho da atualização.
+
+## 29.5 Risco que continua
+
+Pixel Flow! e os clones de lã (Yarn Loop) seguem crescendo (`COMPETITIVO.md`). Se o CPI do Gate M passar de 2× o alvo em 8–10 criativos, o kill criterion do §26 vale como está.

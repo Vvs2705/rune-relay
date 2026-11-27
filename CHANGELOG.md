@@ -4,6 +4,7 @@ Formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), versões [S
 
 ## [Unreleased]
 ### Adicionado
+- Revisão do Conselho do TIME DE JOGOS (2026-11-27): veredito e plano no topo e no fim do `docs/GDD.md`, ata em `docs/conselho/2026-11-27-revisao-gdd.md`, `CLAUDE.md` com a situação nova.
 - `docs/COMPETITIVO.md`: comparativo com 9 similares de 2025–2026 (Pixel Flow!, Magic Sort, Trainyard etc.), matriz de recursos, reclamações dos líderes e 7 diferenciais com custo e validação.
 - Flags de dev `-record` e `-demo` para gravar gameplay real em 9:16 (quadros 1080×1920 + áudio, tempo fixo); 4 criativos de UA (#1, #5, #7 e #10 do GDD §17) em `client/Builds/creatives/`, receita em `docs/CRIATIVOS.md`.
 ### Alterado
